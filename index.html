@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>Daily Nebraskan Burger Shop</title>
+    <!-- We will use the Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Basic Setup --- */
+        :root {
+            --dn-red: #d00000;
+            --gray-light: #f3f4f6;
+            --gray-medium: #e5e7eb;
+            --gray-dark: #374151;
+            --text-dark: #111827;
+            --green-light: #d1fae5;
+            --green-dark: #065f46;
+            --red-light: #fee2e2;
+            --red-dark: #991b1b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--gray-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        #game-wrapper {
+            width: 100%;
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid var(--gray-medium);
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--dn-red);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 4px 0;
+            font-size: 1.75rem; /* 28px */
+            font-weight: 700;
+        }
+        
+        header p {
+            margin: 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* --- Score Display --- */
+        #score-display {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            text-align: center;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+
+        #score-display span {
+            color: var(--dn-red);
+            font-weight: 700;
+        }
+        
+        /* --- Instructions --- */
+        #instructions {
+            padding: 20px 24px;
+            background-color: #f9fafb;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+        
+        #instructions h2 {
+            margin: 0 0 12px 0;
+            font-size: 1.25rem;
+            text-align: center;
+            color: var(--text-dark);
+        }
+        
+        #instructions p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--gray-dark);
+            text-align: center;
+        }
+
+        /* --- Main Game Area --- */
+        #game-area {
+            padding: 24px;
+        }
+
+        /* --- Patron Info Card --- */
+        #patron-info {
+            background-color: #f9fafb;
+            border: 1px solid var(--gray-medium);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        #patron-name-container {
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 16px;
+        }
+
+        #patron-name {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        #patron-order-container {
+            font-size: 1rem; /* 16px */
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 16px;
+        }
+        
+        #patron-order {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 8px 0 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        #patron-order li {
+            background-color: var(--gray-medium);
+            color: var(--gray-dark);
+            padding: 6px 12px;
+            border-radius: 999px; /* Pill shape */
+            font-size: 1rem; /* Updated for emoji */
+            font-weight: 500;
+        }
+        
+        /* This is the patron's dialogue/personality */
+        #patron-personality {
+            font-size: 1.125rem; /* 18px */
+            font-style: italic;
+            color: #1f2937;
+            line-height: 1.6;
+            margin: 0;
+            padding: 16px;
+            background-color: #fff;
+            border-radius: 8px;
+            border: 1px dashed #d1d5db;
+        }
+
+        /* --- Article Choices --- */
+        #article-choices-container h2 {
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        #article-choices {
+            display: grid;
+            grid-template-columns: 1fr; /* Single column layout */
+            gap: 12px;
+        }
+
+        .article-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem; /* 16px */
+            font-weight: 600;
+            color: var(--gray-dark);
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            line-height: 1.5;
+        }
+
+        .article-btn:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .article-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* Classes to be added via JS */
+        .article-btn.correct-btn {
+            background-color: var(--green-light);
+            border-color: #059669;
+            color: var(--green-dark);
+        }
+        
+        .article-btn.incorrect-btn {
+            background-color: var(--red-light);
+            border-color: #dc2626;
+            color: var(--red-dark);
+        }
+
+        /* --- Feedback --- */
+        #feedback {
+            margin-top: 20px;
+            padding: 16px;
+            font-size: 1.125rem; /* 18px */
+            font-weight: 700;
+            text-align: center;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+        }
+        
+        #feedback.correct {
+            background-color: var(--green-light);
+            color: var(--green-dark);
+        }
+        
+        #feedback.incorrect {
+            background-color: var(--red-light);
+            color: var(--red-dark);
+        }
+        
+        /* --- Final Score Screen --- */
+        #final-score-screen {
+            display: none; /* Hidden by default */
+            padding: 40px 24px;
+            text-align: center;
+        }
+        
+        #final-score-message {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        #reset-btn {
+            background-color: var(--dn-red);
+            color: white;
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        #reset-btn:hover {
+            background-color: #a30000;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <header>
+            <h1>Burger Shop</h1>
+            <p>A Daily Nebraskan News Game</p>
+        </header>
+
+        <div id="score-display">Score: <span id="score-value">0</span> / <span id="total-value">0</span></div>
+
+        <!-- NEW: Instructions -->
+        <div id="instructions">
+            <h2>How to Play</h2>
+            <p>Welcome! A patron has come to your counter. Read their dialogue, serve their order, and guess which Daily Nebraskan article is on their mind!</p>
+        </div>
+
+        <!-- This area holds the active game -->
+        <div id="game-area">
+            <div id="patron-info">
+                <div id="patron-name-container">
+                    Patron: <span id="patron-name"></span>
+                </div>
+                <div id="patron-order-container">
+                    Order:
+                    <ul id="patron-order">
+                        <!-- Order items will be added here by JS -->
+                    </ul>
+                </div>
+                <p id="patron-personality">
+                    <!-- Personality/dialogue will be added here by JS -->
+                </p>
+            </div>
+
+            <div id="article-choices-container">
+                <!-- UPDATED: More branded text -->
+                <h2>Which Daily Nebraskan article matches their vibe?</h2>
+                <div id="article-choices">
+                    <!-- Article buttons will be added here by JS -->
+                </div>
+            </div>
+
+            <div id="feedback">
+                <!-- Feedback (correct/incorrect) will be shown here -->
+            </div>
+        </div>
+
+        <!-- This area is hidden until the game ends -->
+        <div id="final-score-screen">
+            <h2 id="final-score-message"></h2>
+            <button id="reset-btn">Play Again?</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. GAME DATA (from our JSON) ---
+        const gameData = {
+            "menuItems": {
+                "Burger": "🍔",
+                "Fries": "🍟",
+                "Hot Dog": "🌭",
+                "Soda": "🥤"
+            },
+            "articles": [
+                {
+                    "articleId": "article_crime",
+                    "headline": "Remains found in Scottsbluff appear to be missing Wyoming man"
+                },
+                {
+                    "articleId": "article_raiola",
+                    "headline": "BREAKING: Dylan Raiola out for season with broken fibula"
+                },
+                {
+                    "articleId": "article_usc_loss",
+                    "headline": "Takeaways from Nebraska football’s tragic loss to No. 23 USC"
+                },
+                {
+                    "articleId": "article_unl_cuts",
+                    "headline": "UNL used bad data to make $27.5 million cuts, faculty say"
+                },
+                {
+                    "articleId": "article_arbys",
+                    "headline": "REVIEW: Arby’s steak nuggets are exactly what you think they are"
+                }
+            ],
+            "patrons": [
+                {
+                    "name": "Devastated Dave",
+                    "order": ["Burger", "Fries", "Soda"],
+                    "personality": "Wearing a Huskers jersey, looks incredibly sad and keeps muttering, 'There goes the season...'",
+                    "correctArticleId": "article_raiola"
+                },
+                {
+                    "name": "Professor Patty",
+                    "order": ["Hot Dog", "Soda"],
+                    "personality": "Has a stack of papers. Grumbling about 'bad numbers' and how 'the university's math is all wrong.'",
+                    "correctArticleId": "article_unl_cuts"
+                },
+                {
+                    "name": "Fast-Foodie Fiona",
+                    "order": ["Burger", "Fries"],
+                    "personality": "She's judging your burger very intensely. 'Let's see if this is better than those new steak nuggets...'",
+                    "correctArticleId": "article_arbys"
+                },
+                {
+                    "name": "Analyst Andy",
+                    "order": ["Fries", "Soda"],
+                    "personality": "Doesn't look as sad as the other sports fan, just thoughtful. 'I just want to know *why* it all went wrong.'",
+                    "correctArticleId": "article_usc_loss"
+                },
+                {
+                    "name": "Mystery Marge",
+                    "order": ["Hot Dog"],
+                    "personality": "Seems a bit grim, listening to a true crime podcast. 'Just drove in from Scottsbluff, wild news out there.'",
+                    "correctArticleId": "article_crime"
+                }
+            ]
+        };
+
+        // --- 2. STATE VARIABLES ---
+        let currentPatronIndex = 0;
+        let score = 0;
+        let gameActive = true; // To prevent multiple clicks
+        const totalQuestions = gameData.patrons.length;
+
+        // --- 3. DOM ELEMENTS ---
+        const scoreValueEl = document.getElementById('score-value');
+        const totalValueEl = document.getElementById('total-value');
+        const gameAreaEl = document.getElementById('game-area');
+        const finalScoreScreenEl = document.getElementById('final-score-screen');
+        const finalScoreMessageEl = document.getElementById('final-score-message');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        const patronNameEl = document.getElementById('patron-name');
+        const patronOrderEl = document.getElementById('patron-order');
+        const patronPersonalityEl = document.getElementById('patron-personality');
+        const articleChoicesEl = document.getElementById('article-choices');
+        const feedbackEl = document.getElementById('feedback');
+
+        // --- 4. GAME FUNCTIONS ---
+
+        /**
+         * Initializes or resets the game.
+         */
+        function loadGame() {
+            currentPatronIndex = 0;
+            score = 0;
+            gameActive = true;
+            
+            // Update score display
+            scoreValueEl.textContent = '0';
+            totalValueEl.textContent = totalQuestions;
+            
+            // Ensure correct screens are shown/hidden
+            gameAreaEl.style.display = 'block';
+            finalScoreScreenEl.style.display = 'none';
+            
+            // Load the first patron
+            displayPatron();
+        }
+
+        /**
+         * Displays the current patron and their order/personality.
+         */
+        function displayPatron() {
+            // Check if game is over
+            if (currentPatronIndex >= totalQuestions) {
+                showFinalScore();
+                return;
+            }
+
+            // Get the current patron
+            const patron = gameData.patrons[currentPatronIndex];
+            
+            // 1. Clear previous data
+            patronOrderEl.innerHTML = '';
+            articleChoicesEl.innerHTML = '';
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+            
+            // 2. Populate patron info
+            patronNameEl.textContent = patron.name;
+            patronPersonalityEl.textContent = `"${patron.personality}"`;
+            
+            // 3. Populate patron order (with emoji!)
+            patron.order.forEach(item => {
+                const li = document.createElement('li');
+                const emoji = gameData.menuItems[item] || '❓';
+                li.textContent = `${emoji} ${item}`; // e.g., "🍔 Burger"
+                patronOrderEl.appendChild(li);
+            });
+            
+            // 4. Populate article choices
+            // We shuffle the articles so the correct answer isn't always in the same place
+            const shuffledArticles = [...gameData.articles].sort(() => 0.5 - Math.random());
+            
+            shuffledArticles.forEach(article => {
+                const button = document.createElement('button');
+                button.className = 'article-btn';
+                button.textContent = article.headline;
+                // Use data-attribute to store the correct ID for checking
+                button.dataset.articleId = article.articleId;
+                
+                button.addEventListener('click', checkAnswer);
+                articleChoicesEl.appendChild(button);
+            });
+            
+            // Ready for player input
+            gameActive = true;
+        }
+
+        /**
+         * Checks the player's answer when an article is clicked.
+         */
+        function checkAnswer(event) {
+            // Stop if an answer is already being processed
+            if (!gameActive) return;
+            gameActive = false; // Lock input
+
+            const clickedButton = event.target;
+            const chosenArticleId = clickedButton.dataset.articleId;
+            const correctArticleId = gameData.patrons[currentPatronIndex].correctArticleId;
+
+            // Disable all buttons
+            const allButtons = document.querySelectorAll('.article-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            // Check if correct
+            if (chosenArticleId === correctArticleId) {
+                score++;
+                scoreValueEl.textContent = score; // Update score display
+                
+                // Show correct feedback
+                clickedButton.classList.add('correct-btn');
+                feedbackEl.textContent = "✅ Correct! Great match!";
+                feedbackEl.className = 'correct';
+                feedbackEl.style.display = 'block';
+            } else {
+                // Show incorrect feedback
+                clickedButton.classList.add('incorrect-btn');
+                feedbackEl.textContent = "❌ Oops! That's not the right article.";
+                feedbackEl.className = 'incorrect';
+                feedbackEl.style.display = 'block';
+                
+                // Highlight the correct answer
+                allButtons.forEach(btn => {
+                    if (btn.dataset.articleId === correctArticleId) {
+                        btn.classList.add('correct-btn');
+                    }
+                });
+            }
+            
+            // Wait 2.5 seconds, then move to the next patron
+            setTimeout(() => {
+                currentPatronIndex++;
+                displayPatron();
+            }, 2500);
+        }
+
+        /**
+         * Displays the final score screen when the game ends.
+         */
+        function showFinalScore() {
+            gameAreaEl.style.display = 'none';
+            
+            let finalMessage = `You served ${score} out of ${totalQuestions} patrons correctly!`;
+            if (score === totalQuestions) {
+                finalMessage = `Wow! ${score} out of ${totalQuestions}! You're a true Daily Nebraskan expert! 🏆`;
+            } else if (score >= totalQuestions / 2) {
+                finalMessage = `Great job! You served ${score} out of ${totalQuestions} patrons correctly!`;
+            } else {
+                 finalMessage = `You served ${score} out of ${totalQuestions} correctly. Thanks for playing!`;
+            }
+            
+            finalScoreMessageEl.textContent = finalMessage;
+            finalScoreScreenEl.style.display = 'block';
+        }
+
+        // --- 5. EVENT LISTENERS ---
+        
+        // Start the game when the page loads
+        document.addEventListener('DOMContentLoaded', loadGame);
+        
+        // Listen for clicks on the "Play Again?" button
+        resetBtn.addEventListener('click', loadGame);
+
+    </script>
+</body>
+</html>
+
